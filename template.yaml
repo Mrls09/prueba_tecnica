@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  test_interview
+
+  Sample SAM Template for test_interview
+
+Globals:
+  Function:
+    Timeout: 3
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+  Api:
+    Cors:
+      AllowOrigin: "'*'"
+      AllowHeaders: "'*'"
+      AllowMethods: "'GET,PUT,POST,DELETE,OPTIONS'"
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+  CreateCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create/
+      Handler: app.create_customer
+      Events:
+        CreateApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CustomerApi
+            Path: /customer/
+            Method: post
+
+  GetAllCustomersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_all/
+      Handler: app.get_all
+      Events:
+        GetAllApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CustomerApi
+            Path: /customer/get-all/
+            Method: get
+
+  UpdateCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: update/
+      Handler: app.update_customer
+      Events:
+        UpdateCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CustomerApi
+            Path: /customer/
+            Method: put
+
+  DeleteCustomerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete/
+      Handler: app.delete_customer
+      Events:
+        DeleteCustomer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CustomerApi
+            Path: /customer/
+            Method: delete
+
+  CustomerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Name: CustomerApi
+
+Outputs:
+  CreateCustomerApi:
+    Description: "API Gateway endpoint URL for Create Customer function"
+    Value: !Sub "https://${CustomerApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/customer/"
+
+  CreateCustomerFunction:
+    Description: "Create Customer Lambda Function ARN"
+    Value: !GetAtt CreateCustomerFunction.Arn
+
+  GetAllCustomersApi:
+    Description: "API Gateway endpoint URL for Get All Customers function"
+    Value: !Sub "https://${CustomerApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/customer/get-all/"
+
+  GetAllCustomersFunction:
+    Description: "Get All Customers Lambda Function ARN"
+    Value: !GetAtt GetAllCustomersFunction.Arn
+
+  UpdateCustomerApi:
+    Description: "API Gateway endpoint URL for Update Customer function"
+    Value: !Sub "https://${CustomerApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/customer/"
+
+  UpdateCustomerFunction:
+    Description: "Update Customer Lambda Function ARN"
+    Value: !GetAtt UpdateCustomerFunction.Arn
+
+  DeleteCustomerApi:
+    Description: "API Gateway endpoint URL for Delete Customer function"
+    Value: !Sub "https://${CustomerApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/customer/"
+
+  DeleteCustomerFunction:
+    Description: "Delete Customer Lambda Function ARN"
+    Value: !GetAtt DeleteCustomerFunction.Arn
