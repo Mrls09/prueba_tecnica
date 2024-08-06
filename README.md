@@ -1,7 +1,11 @@
-# Prueba Tecnica
+# Prueba Técnica
 # Servicio de Gestión de Clientes
 
 Este proyecto proporciona un servicio python(Lambda) para gestionar clientes. Incluye operaciones para crear, leer, actualizar y eliminar información de clientes.
+
+## Esquema de la Base de Datos
+
+El esquema de la base de datos está definido en el archivo `prueba_tecnica_bd.sql`.
 
 ## Endpoints de la API
 
