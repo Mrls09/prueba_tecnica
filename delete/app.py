@@ -16,7 +16,7 @@ def delete_customer(event, context):
                 'headers': headers_open
             }
         data = json.loads(body)
-        phone = data.get('phone')
+        phone = data.get('telefono')
         if not phone:
             return {
                 'statusCode': 400,
